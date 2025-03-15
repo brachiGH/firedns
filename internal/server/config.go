@@ -1,3 +1,3 @@
 package server
 
-const ns = "1.1.1.1" //name server
+var upd_ns = "1.1.1.1:53" //name server
