@@ -23,7 +23,7 @@ func handle(data []byte, qs []*DNSQuestion) ([]byte, error) {
 		}
 	}
 
-	data, err := transport.ForwardPacketTo(data, upd_ns)
+	data, err := transport.ForwardPacketTo(data, UDP_ns_addr)
 	if err != nil {
 		return []byte{}, err
 	}
