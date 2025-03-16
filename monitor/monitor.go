@@ -1,7 +1,6 @@
 package monitor
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os"
@@ -80,22 +79,24 @@ func (x *XDPobj) NICMonitor() {
 		select {
 		case <-tick:
 			var key uint32
-			var value uint16
+			var value uint32
 			iter := x.Objs.nic_monitorMaps.QueryCountPerIp.Iterate()
 			for iter.Next(&key, &value) {
-				fmt.Printf("k: %v v: %+v\n", key, value)
+				log.Printf("k: %v v: %+v\n", key, value)
 
 				if value != 0 {
 					go func() {
-						id, err := db.Update(bson.M{"ip": key}, bson.M{"$inc": bson.M{"QuestionCount": value}})
-						fmt.Printf("id: %v err: %s\n", id, err)
+						db.Update(bson.M{"ip": key}, bson.M{"$inc": bson.M{"QuestionCount": value}})
 					}()
 				}
 
 				err := x.Objs.nic_monitorMaps.QueryCountPerIp.Delete(key)
 				if err != nil {
-					fmt.Println("error deleting:", err)
+					log.Println("error deleting:", err)
 				}
+			}
+			if err := iter.Err(); err != nil {
+				log.Printf("Iteration error: %v", err)
 			}
 		case <-stop:
 			log.Print("Received signal, exiting..")
