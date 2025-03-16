@@ -85,10 +85,10 @@ func (a *Analytics_DB) Disconnect() error {
 }
 
 func (a *Analytics_DB) Update(ip bson.M, doc bson.M) (ID interface{}, err error) {
-	// Insert a document
-	insertOneResult, err := a.collection.UpdateOne(context.Background(), ip, doc)
+	updateOptions := options.Update().SetUpsert(true)
+	insertOneResult, err := a.collection.UpdateOne(context.Background(), ip, doc, updateOptions)
 	if err != nil {
-		return nil, fmt.Errorf("error inserting: %w", err)
+		return nil, fmt.Errorf("error updating: %w", err)
 	}
 
 	return insertOneResult.UpsertedID, nil
