@@ -34,7 +34,6 @@ struct {
 // count response queries per ip (ingress)
 SEC("xdp") 
 int query_analyser(struct xdp_md *ctx) {
-	bpf_printk("a");
 	void *data_end = (void *)(unsigned long)ctx->data_end;
 	void *data = (void *)(unsigned long)ctx->data;
 
@@ -60,7 +59,6 @@ int query_analyser(struct xdp_md *ctx) {
 
 	if (ip->protocol == IPPROTO_UDP)
 	{
-		bpf_printk("d");
 		//Boundary check for UDP
 		if (data + sizeof(*eth) + sizeof(*ip) + sizeof(struct udphdr) > data_end)
 		{
