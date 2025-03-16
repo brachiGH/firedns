@@ -1,1 +1,7 @@
+.vscode
 cmd/cmd
+monitor/*.o
+monitor/*_bpfel.go
+monitor/*_bpfeb.go
+main
+.env
