@@ -15,6 +15,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      ifname: eth0
+      MONGO_DB_URI: mongodb://root:root@mongo:27017
     container_name: firedns
     privileged: true
     ulimits:
