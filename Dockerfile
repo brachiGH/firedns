@@ -18,7 +18,7 @@ RUN tar -C /usr/local -xzf /usr/local/go.tar.gz && rm /usr/local/go.tar.gz
 ENV PATH="$PATH:/usr/local/go/bin"
 
 # installing golangci-lint
-WORKDIR /usr/local/go/bin
+WORKDIR /usr/local/go
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s v2.0.1
 
 RUN mkdir /src
