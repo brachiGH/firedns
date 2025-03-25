@@ -23,7 +23,7 @@ jobs:
 
       # Step 3: Run golangci-lint inside the Docker container
       - name: Run golangci-lint
-        run: docker run --rm firedns golangci-lint run
+        run: docker run --rm firedns:latest golangci-lint run
 
       # Step 4: Run go test inside the Docker container
       - name: Run go test
@@ -33,4 +33,4 @@ jobs:
           --env APP_ENV=production \
           --privileged \
           --ulimit memlock=-1 \
-          firedns go test ./test
+          firedns:latest go test ./test
