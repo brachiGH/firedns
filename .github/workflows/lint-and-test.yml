@@ -19,7 +19,7 @@ jobs:
 
       # Step 2: Build the Docker image
       - name: Build Docker image
-        run: docker-compose up --build -d
+        run: docker build -t firedns -f Dockerfile .
 
       # Step 3: Run golangci-lint inside the Docker container
       - name: Run golangci-lint
