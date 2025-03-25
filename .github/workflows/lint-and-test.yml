@@ -19,7 +19,7 @@ jobs:
 
       # Step 2: Build the Docker image
       - name: Build Docker image
-        run: docker build -t firedns -f Dockerfile .
+        run: docker build -t firedns:latest -f Dockerfile .
 
       # Step 3: Run golangci-lint inside the Docker container
       - name: Run golangci-lint
@@ -33,4 +33,5 @@ jobs:
           --env APP_ENV=production \
           --privileged \
           --ulimit memlock=-1 \
-          firedns:latest go test ./test
+          firedns:latest \
+          go test ./test
