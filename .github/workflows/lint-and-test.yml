@@ -27,11 +27,4 @@ jobs:
 
       # Step 4: Run go test inside the Docker container
       - name: Run go test
-        run: docker run --rm \
-          --env ifname=eth0 \
-          --env MONGO_DB_URI=mongodb://root:root@mongo:27017 \
-          --env APP_ENV=production \
-          --privileged \
-          --ulimit memlock=-1 \
-          firedns:latest \
-          go test ./test
+        run: docker run --rm --env ifname="eth0" --env MONGO_DB_URI="mongodb://root:root@mongo:27017" --env APP_ENV="production" --privileged firedns:latest go test ./test
