@@ -16,7 +16,11 @@ func ForwardPacketTo(data []byte, serverAddr string) ([]byte, error) {
 	if err != nil {
 		return []byte{}, fmt.Errorf("error connecting to UDP server: %w", err)
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	// Send Data
 	_, err = conn.Write(data)

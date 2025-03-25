@@ -1,14 +1,12 @@
 package server
 
-import (
-	"errors"
-)
+import "fmt"
 
 // parsing dns header and Questions
 // returns header content and list raw lables list
 func NewDNSMessage(data []byte) ([]*DNSQuestion, error) {
 	if len(data) < hdrSize {
-		return nil, errors.New("message is too short")
+		return nil, fmt.Errorf("message is too short")
 	}
 
 	hdr := NewDNSHeader(data)

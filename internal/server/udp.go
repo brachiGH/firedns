@@ -3,32 +3,42 @@ package server
 import (
 	"net"
 
-	"github.com/brachiGH/firedns/internal/utils"
+	"github.com/brachiGH/firedns/internal/utils/logger"
+	"go.uber.org/zap"
 )
 
 func Upd_dns_server() {
-	log := utils.NewLogger()
+	log := logger.NewLogger()
+	defer func() {
+		if err := log.Sync(); err != nil {
+			panic(err)
+		}
+	}()
 
 	udpAddr, err := net.ResolveUDPAddr("udp", "0.0.0.0:2053")
 	if err != nil {
-		log.Error.Fatalln("Failed to resolve UDP address: ", err)
-		return
+		log.Fatal("Failed to resolve UDP address: ", zap.Error(err))
+		panic(err)
 	}
-	log.Info.Println("Server started", "port", 2053)
+	log.Info("Server started", zap.String("port", "2053"))
 
 	udpConn, err := net.ListenUDP("udp", udpAddr)
 	if err != nil {
-		log.Error.Fatalln("Failed to bind to address: ", err)
-		return
+		log.Fatal("Failed to bind to address: ", zap.Error(err))
+		panic(err)
 	}
-	defer udpConn.Close()
+
+	defer func() {
+		if err := udpConn.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	buf := make([]byte, maxPacketsize+1) // max size is 512, The extra byte is to detect if the packet is lager then 512bytes
 	for {
 		size, source, err := udpConn.ReadFromUDP(buf)
 		if err != nil {
-			log.Error.Fatalln("Error receiving data: ", err)
-			return
+			log.Fatal("Error receiving data: ", zap.Error(err))
 		}
 		if size == maxPacketsize+1 {
 			// UDP response larger than 512 bytes are not supported
@@ -37,19 +47,16 @@ func Upd_dns_server() {
 
 		qs, err := NewDNSMessage(buf[:size])
 		if err != nil {
-			log.Error.Fatalln("Error parsing incoming message: ", err)
-			return
+			log.Fatal("Error parsing incoming message: ", zap.Error(err))
 		}
 
 		data, err := handle(buf[:size], qs)
 		if err != nil {
-			log.Error.Fatalln("Fail to handle request: ", err)
-			return
+			log.Fatal("Fail to handle request: ", zap.Error(err))
 		}
 		_, err = udpConn.WriteToUDP(data, source)
 		if err != nil {
-			log.Error.Fatalln("Failed to send response: ", err)
-			return
+			log.Fatal("Failed to send response: ", zap.Error(err))
 		}
 	}
 }

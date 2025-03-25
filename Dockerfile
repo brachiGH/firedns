@@ -17,6 +17,10 @@ RUN curl -L -o /usr/local/go.tar.gz https://go.dev/dl/go1.24.1.linux-amd64.tar.g
 RUN tar -C /usr/local -xzf /usr/local/go.tar.gz && rm /usr/local/go.tar.gz
 ENV PATH="$PATH:/usr/local/go/bin"
 
+# installing golangci-lint
+WORKDIR /usr/local/go/bin
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s v2.0.1
+
 RUN mkdir /src
 WORKDIR /src
 
@@ -30,6 +34,10 @@ RUN make install
 WORKDIR /src
 RUN go mod download
 
+WORKDIR /src/monitor
+RUN go generate
+
+WORKDIR /src
 RUN make cleanmake
 
 EXPOSE 2053

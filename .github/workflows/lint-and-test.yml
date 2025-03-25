@@ -1,0 +1,30 @@
+name: Lint and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Build the Docker image
+      - name: Build Docker image
+        run: docker build -t firedns -f Dockerfile .
+
+      # Step 3: Run golangci-lint inside the Docker container
+      - name: Run golangci-lint
+        run: docker run --rm firedns golangci-lint run
+
+      # Step 4: Run go test inside the Docker container
+      - name: Run go test
+        run: docker run --rm firedns go test ./test

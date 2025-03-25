@@ -18,6 +18,7 @@ services:
     environment:
       ifname: eth0
       MONGO_DB_URI: mongodb://root:root@mongo:27017
+      APP_ENV: production
     container_name: firedns
     privileged: true
     ulimits:

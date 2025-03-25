@@ -3,11 +3,17 @@ package test
 import (
 	"net"
 	"testing"
+	"time"
 
 	"github.com/brachiGH/firedns/internal/server"
 )
 
 func TestDNSudpMessage(t *testing.T) {
+	go server.Upd_dns_server()
+
+	// Wait for the UDP server to start
+	time.Sleep(1 * time.Second)
+
 	// Connect to a DoT server (firedns's local on port 2053)
 	addr, err := net.ResolveUDPAddr("udp", server.UDP_local_ns_addr)
 	if err != nil {
@@ -19,7 +25,11 @@ func TestDNSudpMessage(t *testing.T) {
 	if err != nil {
 		t.Fatal("error connecting to UDP server: %w", err)
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			t.Log("error closing connection: ", err)
+		}
+	}()
 
 	// Minimal DNS Query (Query for google.com, type A)
 	data := []byte{

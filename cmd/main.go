@@ -1,8 +1,11 @@
 package main
 
 import (
+	"log"
+
 	"github.com/brachiGH/firedns/internal/server"
 	"github.com/brachiGH/firedns/monitor"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -15,14 +18,38 @@ func main() {
 	// 	os.Exit(1)
 	// }
 
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	go server.Upd_dns_server()
 
 	var xdp monitor.XDPobj
-	xdp.LoadAndLink()
+	err = xdp.Load()
+	if err != nil {
+		log.Fatal("Failed to load and link XDP: ", err)
+	}
+	err = xdp.Link()
+	if err != nil {
+		log.Fatal("Failed to link XDP: ", err)
+	}
 	defer xdp.UnloadAndCLoseLink()
 	go xdp.NICMonitor()
-	go xdp.UpdatePremiumIps()
-	go xdp.UpdateUsageLimitIps()
+	go func() {
+		err := xdp.UpdatePremiumIps()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	go func() {
+		err := xdp.UpdateUsageLimitIps()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	// go transport.TLS()
 	// go server.StartDoTServer("/etc/letsencrypt/live/brachi.me/fullchain.pem", "/etc/letsencrypt/live/brachi.me/privkey.pem")
 
