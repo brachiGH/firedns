@@ -5,8 +5,8 @@ RUN apt-get update && \
                        zlib1g-dev libevent-dev m4 \
                        libelf-dev llvm \
                        clang libc6-dev-i386 libpcap-dev \
-		       curl tar sudo linux-tools-$(uname -r) \
-		       linux-headers-$(uname -r) pkg-config
+		       curl tar sudo linux-tools-6.11.0-19-generic \
+		       linux-headers-6.11.0-19-generic pkg-config
 
 # Link asm/byteorder.h into eBPF
 RUN ln -s /usr/include/x86_64-linux-gnu/asm/ /usr/include/asm
