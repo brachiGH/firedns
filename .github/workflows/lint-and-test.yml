@@ -19,7 +19,7 @@ jobs:
 
       # Step 2: Build the Docker image
       - name: Build Docker image
-        run: docker build -t firedns -f Dockerfile .
+        run: docker-compose up --build -d
 
       # Step 3: Run golangci-lint inside the Docker container
       - name: Run golangci-lint
@@ -27,4 +27,10 @@ jobs:
 
       # Step 4: Run go test inside the Docker container
       - name: Run go test
-        run: docker run --rm firedns go test ./test
+        run: docker run --rm \
+          --env ifname=eth0 \
+          --env MONGO_DB_URI=mongodb://root:root@mongo:27017 \
+          --env APP_ENV=production \
+          --privileged \
+          --ulimit memlock=-1 \
+          firedns go test ./test
