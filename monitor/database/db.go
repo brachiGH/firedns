@@ -29,13 +29,13 @@ func (a *Analytics_DB) Connect() error {
 	// Connect to MongoDB
 	a.client, err = mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
-		return fmt.Errorf("error connecting: %w", err)
+		return fmt.Errorf("error connecting to db: %w", err)
 	}
 
 	// Check the connection
 	err = a.client.Ping(context.Background(), nil)
 	if err != nil {
-		return fmt.Errorf("error connecting: connection check failed: %w", err)
+		return fmt.Errorf("error connecting to db: connection check failed: %w", err)
 	}
 
 	fmt.Println("Connected to MongoDB!")
@@ -48,7 +48,7 @@ func (a *Analytics_DB) Connect() error {
 
 func (a *Analytics_DB) Disconnect() error {
 	if err := a.client.Disconnect(context.Background()); err != nil {
-		return fmt.Errorf("error disconnecting: %w", err)
+		return fmt.Errorf("error disconnecting from db: %w", err)
 	}
 	return nil
 }
@@ -57,7 +57,7 @@ func (a *Analytics_DB) Update(ip bson.M, doc bson.M) (ID interface{}, err error)
 	updateOptions := options.Update().SetUpsert(true)
 	insertOneResult, err := a.collection.UpdateOne(context.Background(), ip, doc, updateOptions)
 	if err != nil {
-		return nil, fmt.Errorf("error updating: %w", err)
+		return nil, fmt.Errorf("error updating db: %w", err)
 	}
 
 	return insertOneResult.UpsertedID, nil
