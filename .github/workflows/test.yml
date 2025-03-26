@@ -13,18 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Build the Docker image
       - name: Build Docker image
         run: docker build -t firedns:latest -f Dockerfile .
 
-      # Step 3: Run golangci-lint inside the Docker container
-      - name: Run golangci-lint
-        run: docker run --rm firedns:latest golangci-lint run
-
-      # Step 4: Run go test inside the Docker container
+      # Run go test inside the Docker container
       - name: Run go test
         run: docker run --rm --env ifname="eth0" --env MONGO_DB_URI="mongodb://root:root@mongo:27017" --env APP_ENV="production" --privileged firedns:latest go test ./test
