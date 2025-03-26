@@ -5,9 +5,9 @@ func ToUint16(bs []byte) uint16 {
 }
 
 func FromUint16(n uint16) []byte {
-	return []byte{byte(n >> 8), byte(n & 255)}
+	return []byte{byte(n >> 8), byte(n & 0xFF)}
 }
 
 func FromUint32(n uint32) []byte {
-	return []byte{byte(n >> 24), byte(n >> 16), byte(n >> 8), byte(n & 255)}
+	return []byte{byte(n >> 24), byte(n >> 16), byte(n >> 8), byte(n & 0xFF)}
 }
