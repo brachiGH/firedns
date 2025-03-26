@@ -4,7 +4,7 @@ package server
 // note: a QNAME is represented as a sequence of length-delimited labels
 type DNSQuestion struct {
 	labelsStartPointer uint8
-	labelsEndPointer   uint8
+	labelsEndPointer   uint8 // Note: this pointer dosn't pointer to the null byte at the end of the QNAME
 }
 
 func NewDNSQuestion(start int, data []byte) (*DNSQuestion, int) {

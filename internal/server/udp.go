@@ -45,15 +45,11 @@ func Upd_dns_server() {
 			continue
 		}
 
-		qs, err := NewDNSMessage(buf[:size])
-		if err != nil {
-			log.Fatal("Error parsing incoming message: ", zap.Error(err))
-		}
-
-		data, err := handle(buf[:size], qs)
+		data, err := handle(buf[:size])
 		if err != nil {
 			log.Fatal("Fail to handle request: ", zap.Error(err))
 		}
+
 		_, err = udpConn.WriteToUDP(data, source)
 		if err != nil {
 			log.Fatal("Failed to send response: ", zap.Error(err))
