@@ -30,15 +30,26 @@ func handle(data []byte) ([]byte, error) {
 		length := int(q.labelsEndPointer-q.labelsStartPointer) - 1
 		if length > 0 {
 			dnsMessage := CreateBlockedDomainDNSMessage(data, hdr, q)
-			return dnsMessage.AsBytes(data), nil
+			return dnsMessage.AsBytes(), nil
 		} else {
 			return []byte{}, fmt.Errorf("invalid QNAME")
 		}
 	}
 
-	data, err = transport.ForwardPacketTo(data, UDP_ns_addr)
-	if err != nil {
-		return []byte{}, fmt.Errorf("fail to lookup: %w", err)
+	lables := q.GetLables(data)
+
+	arr := GetDNSAnswer__Cache(lables)
+	if arr == nil {
+		data, err = transport.ForwardPacketTo(data, UDP_ns_addr)
+		if err != nil {
+			return []byte{}, fmt.Errorf("fail to lookup: %w", err)
+		}
+
+		arr = DNSAnswerFromBytes(data, q)
+		AddDNSAnswer__Cache(lables, arr)
+	} else {
+		dnsMessage := ReuseDNSAnswer__Cache(data, hdr, q, arr)
+		return dnsMessage.AsBytes(), nil
 	}
 
 	// var rrs []*ResourceRecord

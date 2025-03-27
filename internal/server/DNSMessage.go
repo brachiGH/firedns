@@ -6,8 +6,8 @@ import (
 
 type DNSMessage struct {
 	hdr          *DNSHeader
-	q            *DNSQuestion
-	AnswerRR     *AnswerResourceRecord
+	q            []byte
+	AnswerRR     *DNSAnswer
 	AdditionalRR []byte
 }
 
@@ -29,7 +29,7 @@ func NewDNSMessage(data []byte) (*DNSQuestion, error) {
 	return qs, nil
 }
 
-func (m *DNSMessage) AsBytes(data []byte) []byte {
+func (m *DNSMessage) AsBytes() []byte {
 	b := make([]byte, hdrSize)
 	copy(b[0:2], utils.FromUint16(m.hdr.id))
 	copy(b[2:4], m.hdr.flags[:])
@@ -37,7 +37,7 @@ func (m *DNSMessage) AsBytes(data []byte) []byte {
 	copy(b[6:8], utils.FromUint16(m.hdr.ancount))
 	copy(b[8:10], utils.FromUint16(m.hdr.nscount))
 	copy(b[10:12], utils.FromUint16(m.hdr.arcount))
-	b = append(b, data[m.q.labelsStartPointer:m.q.labelsEndPointer+1+QueryInfomationBytesLength]...)
+	b = append(b, m.q...)
 	b = append(b, m.AnswerRR.AsBytes()...)
 	b = append(b, m.AdditionalRR...)
 	return b

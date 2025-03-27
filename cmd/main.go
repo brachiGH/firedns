@@ -24,6 +24,7 @@ func main() {
 	}
 
 	go server.Upd_dns_server()
+	go server.ClearCache_Routine()
 
 	var xdp monitor.XDPobj
 	err = xdp.Load()

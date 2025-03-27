@@ -6,13 +6,13 @@ func CheckIfDomainIsBlocked(qs *DNSQuestion, data []byte) bool {
 }
 
 func CreateBlockedDomainDNSMessage(data []byte, hdr *DNSHeader, q *DNSQuestion) *DNSMessage {
-	arr := &AnswerResourceRecord{
-		name:  data[q.labelsStartPointer:q.labelsEndPointer],
+	arr := &DNSAnswer{
+		name:  []byte{0xC0, 0x0C},
 		typ:   1,
 		class: 1,
 		ttl:   60,
 		rdlen: 4,
-		rdata: []byte("0.0.0.0"),
+		rdata: []byte{0x00, 0x00, 0x00, 0x00},
 	}
 
 	hdr.ancount = 1
@@ -27,7 +27,7 @@ func CreateBlockedDomainDNSMessage(data []byte, hdr *DNSHeader, q *DNSQuestion) 
 
 	dnsMessage := &DNSMessage{
 		hdr:          hdr,
-		q:            q,
+		q:            data[q.labelsStartPointer : q.labelsEndPointer+1+QueryInfomationBytesLength],
 		AnswerRR:     arr,
 		AdditionalRR: UDP_Response_Additional_Records,
 	}

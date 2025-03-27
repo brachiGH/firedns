@@ -9,11 +9,6 @@ import (
 
 func Upd_dns_server() {
 	log := logger.NewLogger()
-	defer func() {
-		if err := log.Sync(); err != nil {
-			panic(err)
-		}
-	}()
 
 	udpAddr, err := net.ResolveUDPAddr("udp", "0.0.0.0:2053")
 	if err != nil {
