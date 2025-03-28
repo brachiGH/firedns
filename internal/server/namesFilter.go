@@ -4,6 +4,7 @@ import (
 	"net"
 
 	"github.com/brachiGH/firedns/internal/utils"
+	"github.com/brachiGH/firedns/internal/utils/config"
 )
 
 func CheckIfDomainIsBlocked(lables []utils.Lable, IP net.IP) bool {
@@ -35,7 +36,7 @@ func CreateBlockedDomainDNSMessage(data []byte, hdr *DNSHeader, q *DNSQuestion) 
 		hdr:          hdr,
 		q:            data[q.labelsStartPointer : q.labelsEndPointer+1+QueryInfomationBytesLength],
 		AnswerRR:     arr,
-		AdditionalRR: UDP_Response_Additional_Records,
+		AdditionalRR: config.UDP_Response_Additional_Records,
 	}
 
 	return dnsMessage

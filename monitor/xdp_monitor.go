@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/brachiGH/firedns/internal/utils/config"
 	"github.com/brachiGH/firedns/internal/utils/logger"
 	"github.com/brachiGH/firedns/monitor/database"
 	"github.com/cilium/ebpf/link"
@@ -103,7 +104,7 @@ func (x *XDPobj) NICMonitor() {
 
 	// Periodically fetch the packet counter from PktCount,
 	// exit the program when interrupted.
-	tick := time.Tick(time.Minute)
+	tick := time.Tick(config.NICMonitor__TickDuration)
 	for range tick {
 		var key uint32
 		var value uint32

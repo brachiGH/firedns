@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/brachiGH/firedns/internal/server"
+	"github.com/brachiGH/firedns/internal/utils/config"
 )
 
 func TestDNSudpMessage(t *testing.T) {
@@ -15,7 +16,7 @@ func TestDNSudpMessage(t *testing.T) {
 	time.Sleep(1 * time.Second)
 
 	// Connect to a DoT server (firedns's local on port 2053)
-	addr, err := net.ResolveUDPAddr("udp", server.UDP_local_ns_addr)
+	addr, err := net.ResolveUDPAddr("udp", config.UDP_local_ns_addr)
 	if err != nil {
 		t.Fatal("Failed to error resolving UDP address: ", err)
 	}

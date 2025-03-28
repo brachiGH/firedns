@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/brachiGH/firedns/internal/utils"
+	"github.com/brachiGH/firedns/internal/utils/config"
 )
 
 type nameSpaceNode struct {
@@ -71,7 +72,7 @@ func ReuseDNSAnswer__Cache(data []byte, hdr *DNSHeader, q *DNSQuestion, arr *DNS
 }
 
 func ClearCache_Routine() {
-	tick := time.Tick(time.Minute)
+	tick := time.Tick(config.ClearCache__TickDuration)
 	for range tick {
 		namesSpaceWG.Add(1)
 		nameSpaceRoot.children = make(map[utils.Lable]*nameSpaceNode)

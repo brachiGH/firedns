@@ -6,6 +6,7 @@ import (
 
 	"github.com/brachiGH/firedns/internal/transport"
 	"github.com/brachiGH/firedns/internal/utils"
+	"github.com/brachiGH/firedns/internal/utils/config"
 	"github.com/brachiGH/firedns/monitor"
 )
 
@@ -46,7 +47,7 @@ func handle(data []byte, sourceIP net.IP) ([]byte, error) {
 
 	arr := GetDNSAnswer__Cache(lables)
 	if arr == nil {
-		data, err = transport.ForwardPacketTo(data, UDP_ns_addr)
+		data, err = transport.ForwardPacketTo(data, config.UDP_ns_addr)
 		if err != nil {
 			return nil, fmt.Errorf("fail to lookup: %w", err)
 		}

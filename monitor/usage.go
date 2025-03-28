@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/brachiGH/firedns/internal/utils/config"
 	"github.com/brachiGH/firedns/monitor/database"
 )
 
@@ -19,7 +20,7 @@ func (x *XDPobj) UpdateUsageLimitIps() error {
 		}
 	}()
 
-	tick := time.Tick(time.Minute * 10)
+	tick := time.Tick(config.UpdateUsageLimitIps__TickDuration)
 	for range tick {
 		keys := []uint32{}
 		values := []uint32{}
@@ -44,7 +45,7 @@ func (x *XDPobj) UpdatePremiumIps() error {
 		}
 	}()
 
-	tick := time.Tick(time.Minute * 10)
+	tick := time.Tick(config.UpdatePremiumIps__TickDuration)
 	for range tick {
 		keys := []uint32{}
 		values := []uint32{}

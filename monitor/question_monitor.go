@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/brachiGH/firedns/internal/utils"
+	"github.com/brachiGH/firedns/internal/utils/config"
 	"github.com/brachiGH/firedns/internal/utils/logger"
 	"github.com/brachiGH/firedns/monitor/database"
 	"go.mongodb.org/mongo-driver/bson"
@@ -54,7 +55,7 @@ func UpdateQuestions_Routine() {
 			log.Fatal("update question routine failed to disconnect", zap.Error(err))
 		}
 	}()
-	tick := time.Tick(30 * time.Second)
+	tick := time.Tick(config.UpdateQuestions__TickDuration)
 	for range tick {
 		updates := []mongo.WriteModel{}
 
