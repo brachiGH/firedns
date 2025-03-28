@@ -3,21 +3,23 @@ package server
 import (
 	"sync"
 	"time"
+
+	"github.com/brachiGH/firedns/internal/utils"
 )
 
 type nameSpaceNode struct {
 	arr      DNSAnswer
-	children map[Lable]*nameSpaceNode
+	children map[utils.Lable]*nameSpaceNode
 }
 
 func NewNameSpaceNode(arr DNSAnswer) *nameSpaceNode {
-	return &nameSpaceNode{arr: arr, children: make(map[Lable]*nameSpaceNode)}
+	return &nameSpaceNode{arr: arr, children: make(map[utils.Lable]*nameSpaceNode)}
 }
 
 var nameSpaceRoot = NewNameSpaceNode(DNSAnswer{})
 var namesSpaceWG sync.WaitGroup
 
-func GetDNSAnswer__Cache(lables []Lable) (arr *DNSAnswer) {
+func GetDNSAnswer__Cache(lables []utils.Lable) (arr *DNSAnswer) {
 	namesSpaceWG.Wait() // block until any ongoing cache clearing operation completes
 
 	parent := nameSpaceRoot
@@ -32,7 +34,7 @@ func GetDNSAnswer__Cache(lables []Lable) (arr *DNSAnswer) {
 	return &parent.arr
 }
 
-func AddDNSAnswer__Cache(lables []Lable, arr *DNSAnswer) {
+func AddDNSAnswer__Cache(lables []utils.Lable, arr *DNSAnswer) {
 	namesSpaceWG.Wait() // block until any ongoing cache clearing operation completes
 
 	parent := nameSpaceRoot
@@ -72,8 +74,7 @@ func ClearCache_Routine() {
 	tick := time.Tick(time.Minute)
 	for range tick {
 		namesSpaceWG.Add(1)
-		defer namesSpaceWG.Done()
-		nameSpaceRoot.children = make(map[Lable]*nameSpaceNode)
-		return
+		nameSpaceRoot.children = make(map[utils.Lable]*nameSpaceNode)
+		namesSpaceWG.Done()
 	}
 }

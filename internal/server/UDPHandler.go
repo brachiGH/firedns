@@ -2,12 +2,15 @@ package server
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/brachiGH/firedns/internal/transport"
+	"github.com/brachiGH/firedns/internal/utils"
+	"github.com/brachiGH/firedns/monitor"
 )
 
 // checks for blocked domains and forwards the packet to dns resolver
-func handle(data []byte) ([]byte, error) {
+func handle(data []byte, sourceIP net.IP) ([]byte, error) {
 	if len(data) < hdrSize {
 		return nil, fmt.Errorf("message is too short")
 	}
@@ -21,49 +24,39 @@ func handle(data []byte) ([]byte, error) {
 
 	q, err := NewDNSMessage(data)
 	if err != nil {
-		return []byte{}, fmt.Errorf("error parsing incoming message: %v", err)
+		return nil, fmt.Errorf("error parsing incoming message: %v", err)
 	}
 
-	blocked := CheckIfDomainIsBlocked(q, data)
+	lables := q.GetLables(data)
+	blocked := CheckIfDomainIsBlocked(lables, sourceIP)
 
 	if blocked {
 		length := int(q.labelsEndPointer-q.labelsStartPointer) - 1
 		if length > 0 {
+			monitor.Droped(utils.ToIP(sourceIP), lables)
+
 			dnsMessage := CreateBlockedDomainDNSMessage(data, hdr, q)
 			return dnsMessage.AsBytes(), nil
 		} else {
-			return []byte{}, fmt.Errorf("invalid QNAME")
+			return nil, fmt.Errorf("invalid QNAME")
 		}
 	}
 
-	lables := q.GetLables(data)
+	monitor.Passed(utils.ToIP(sourceIP), lables)
 
 	arr := GetDNSAnswer__Cache(lables)
 	if arr == nil {
 		data, err = transport.ForwardPacketTo(data, UDP_ns_addr)
 		if err != nil {
-			return []byte{}, fmt.Errorf("fail to lookup: %w", err)
+			return nil, fmt.Errorf("fail to lookup: %w", err)
 		}
 
 		arr = DNSAnswerFromBytes(data, q)
-		AddDNSAnswer__Cache(lables, arr)
+		go AddDNSAnswer__Cache(lables, arr)
 	} else {
 		dnsMessage := ReuseDNSAnswer__Cache(data, hdr, q, arr)
 		return dnsMessage.AsBytes(), nil
 	}
-
-	// var rrs []*ResourceRecord
-	// for _, q := range qs {
-	// 	label := string(data[q.labelsStartPointer:q.labelsEndPointer])
-	// rrs = append(rrs, &ResourceRecord{
-	// 	name:  label,
-	// 	typ:   1,
-	// 	class: 1,
-	// 	ttl:   60,
-	// 	rdlen: 4,
-	// 	rdata: []byte(ip.IP),
-	// })
-	// }
 
 	return data, nil
 }

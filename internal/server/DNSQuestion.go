@@ -1,6 +1,10 @@
 package server
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/brachiGH/firedns/internal/utils"
+)
 
 // this struct stores the pointer to the QNAME in each question
 // note: a QNAME is represented as a sequence of length-delimited labels
@@ -8,9 +12,6 @@ type DNSQuestion struct {
 	labelsStartPointer uint8
 	labelsEndPointer   uint8 // Note: this pointer dosn't pointer to the null byte at the end of the QNAME
 }
-
-// Label represents a domain name label.
-type Lable string
 
 // NewDNSQuestion parses a QNAME stored in data starting at index start.
 // It returns a pointer to DNSQuestion and the index immediately after the question.
@@ -45,14 +46,14 @@ func NewDNSQuestion(start int, data []byte) (*DNSQuestion, int) {
 }
 
 // GetLabels returns a slice of labels (strings) for the QNAME based on the DNSQuestion pointers.
-func (q *DNSQuestion) GetLables(data []byte) []Lable {
-	labels := make([]Lable, 0)
+func (q *DNSQuestion) GetLables(data []byte) []utils.Lable {
+	labels := make([]utils.Lable, 0)
 
 	for i := q.labelsStartPointer; i < q.labelsEndPointer; i++ {
 		lableSize := data[i]
 
 		lable := strings.ToLower(string(data[i+1 : i+1+lableSize]))
-		labels = append(labels, Lable(lable))
+		labels = append(labels, utils.Lable(lable))
 
 		i += lableSize
 	}

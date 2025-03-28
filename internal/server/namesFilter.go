@@ -1,6 +1,12 @@
 package server
 
-func CheckIfDomainIsBlocked(qs *DNSQuestion, data []byte) bool {
+import (
+	"net"
+
+	"github.com/brachiGH/firedns/internal/utils"
+)
+
+func CheckIfDomainIsBlocked(lables []utils.Lable, IP net.IP) bool {
 
 	return false
 }
