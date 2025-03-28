@@ -62,3 +62,12 @@ func (a *Analytics_DB) Update(ip bson.M, doc bson.M) (ID interface{}, err error)
 
 	return insertOneResult.UpsertedID, nil
 }
+
+func (a *Analytics_DB) UpdateMany(updates []mongo.WriteModel) error {
+	_, err := a.collection.BulkWrite(context.Background(), updates)
+	if err != nil {
+		return fmt.Errorf("error updating many docs: %w", err)
+	}
+
+	return nil
+}
