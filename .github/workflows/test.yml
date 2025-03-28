@@ -1,4 +1,4 @@
-name: Test
+name: Runing Tests
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  lint-and-test:
+  tests:
     runs-on: ubuntu-latest
 
     steps:
