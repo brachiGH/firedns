@@ -19,6 +19,9 @@ func NewDNSQuestion(start int, data []byte) (*DNSQuestion, int) {
 	i := start
 	pointerEnd := -1
 	for {
+		if i >= len(data) {
+			return nil, 0
+		}
 		l := int(data[i])
 		i++
 		if l == 0 {

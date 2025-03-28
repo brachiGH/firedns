@@ -1,6 +1,8 @@
 package server
 
 import (
+	"errors"
+
 	"github.com/brachiGH/firedns/internal/utils"
 )
 
@@ -24,7 +26,11 @@ func NewDNSMessage(data []byte) (*DNSQuestion, error) {
 	// }
 	**/
 	var qs *DNSQuestion
-	qs, _ = NewDNSQuestion(qoffset, data)
+	qs, qoffset = NewDNSQuestion(qoffset, data)
+
+	if qs == nil || qoffset > len(data) {
+		return nil, errors.New("invalid question")
+	}
 
 	return qs, nil
 }
