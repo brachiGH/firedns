@@ -37,13 +37,13 @@ func main() {
 	}
 	defer xdp.UnloadAndCLoseLink()
 	go xdp.NICMonitor()
+
 	go func() {
 		err := xdp.UpdatePremiumIps()
 		if err != nil {
 			log.Fatal(err)
 		}
 	}()
-
 	go func() {
 		err := xdp.UpdateUsageLimitIps()
 		if err != nil {
