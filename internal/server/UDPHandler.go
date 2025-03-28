@@ -52,7 +52,9 @@ func handle(data []byte, sourceIP net.IP) ([]byte, error) {
 		}
 
 		arr = DNSAnswerFromBytes(data, q)
-		go AddDNSAnswer__Cache(lables, arr)
+		if arr != nil {
+			go AddDNSAnswer__Cache(lables, arr)
+		}
 	} else {
 		dnsMessage := ReuseDNSAnswer__Cache(data, hdr, q, arr)
 		return dnsMessage.AsBytes(), nil

@@ -14,6 +14,11 @@ type DNSAnswer struct {
 }
 
 func DNSAnswerFromBytes(data []byte, q *DNSQuestion) *DNSAnswer {
+	answerCount := int(data[6])<<8 | int(data[7])
+	if answerCount != 1 {
+		return nil
+	}
+
 	arrStartPointer := q.labelsEndPointer + QueryInfomationBytesLength + 1
 	name := []byte{0xC0, 0x0C}
 	if data[arrStartPointer] != 0xC0 {
