@@ -59,6 +59,7 @@ make cleabmake
 run:
 
 ```bash
+docker-compose up mongo -d
 sudo ./main
 ```
 
