@@ -37,6 +37,7 @@ func Upd_dns_server() {
 			log.Error("Error receiving data: ", zap.Error(err))
 			continue
 		}
+		log.Debug("new connection", zap.Any("IP", source.IP.String()))
 		if size >= maxPacketsize+1 {
 			// UDP response larger than 512 bytes are not supported
 			continue
