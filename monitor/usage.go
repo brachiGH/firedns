@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"log"
 	"time"
 
 	"github.com/brachiGH/firedns/monitor/database"
@@ -14,7 +15,7 @@ func (x *XDPobj) UpdateUsageLimitIps() error {
 	}
 	defer func() {
 		if err := db.Disconnect(); err != nil {
-			panic(err)
+			log.Fatalln(err)
 		}
 	}()
 
@@ -39,7 +40,7 @@ func (x *XDPobj) UpdatePremiumIps() error {
 	}
 	defer func() {
 		if err := db.Disconnect(); err != nil {
-			panic(err)
+			log.Fatalln(err)
 		}
 	}()
 

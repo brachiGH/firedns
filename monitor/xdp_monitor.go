@@ -5,14 +5,15 @@ import (
 	"log"
 	"net"
 	"os"
-	"os/signal"
 	"time"
 
+	"github.com/brachiGH/firedns/internal/utils/logger"
 	"github.com/brachiGH/firedns/monitor/database"
 	"github.com/cilium/ebpf/link"
 	"github.com/cilium/ebpf/rlimit"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.uber.org/zap"
 )
 
 type XDPobj struct {
@@ -75,68 +76,61 @@ func (x *XDPobj) Link() error {
 func (x *XDPobj) UnloadAndCLoseLink() {
 	err := x.link.Close()
 	if err != nil {
-		log.Printf("Error closing link: %v", err)
+		log.Fatalf("XDP: Error closing link: %v", err)
 	}
 
 	err = x.Objs.Close()
 	if err != nil {
-		log.Printf("Error closing objects: %v", err)
+		log.Fatalf("XDP: Error closing objects: %v", err)
 	}
 }
 
 func (x *XDPobj) NICMonitor() {
+	log := logger.NewLogger()
+
 	//** note: If eBPF/XDP related objects are not defined, execute the 'go generate' command in the directory containing this file. **//
 
 	var db database.Analytics_DB
 	err := db.Connect()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("NIC monitor: failed to connect", zap.Error(err))
 	}
 	defer func() {
 		if err := db.Disconnect(); err != nil {
-			panic(err)
+			log.Fatal("NIC monitor: failed to disconnect", zap.Error(err))
 		}
 	}()
 
 	// Periodically fetch the packet counter from PktCount,
 	// exit the program when interrupted.
-	tick := time.Tick(time.Second)
-	stop := make(chan os.Signal, 5)
-	signal.Notify(stop, os.Interrupt)
-	for {
-		select {
-		case <-tick:
-			var key uint32
-			var value uint32
-			iter := x.Objs.QueryCountPerIp.Iterate()
-			for iter.Next(&key, &value) {
-				log.Printf("k: %v v: %+v\n", key, value)
-				updates := []mongo.WriteModel{}
+	tick := time.Tick(time.Minute)
+	for range tick {
+		var key uint32
+		var value uint32
+		iter := x.Objs.QueryCountPerIp.Iterate()
+		for iter.Next(&key, &value) {
+			log.DPanic("XDP", zap.Uint32("key", key), zap.Uint32("value", value))
+			updates := []mongo.WriteModel{}
 
-				if value != 0 {
-					updates = append(updates, mongo.NewUpdateOneModel().
-						SetFilter(bson.M{"ip": key}).
-						SetUpdate(bson.M{"$inc": bson.M{"QuestionCount": value}}).SetUpsert(true))
-				}
-				go func() {
-					err := db.UpdateMany(updates)
-					if err != nil {
-						log.Println("error updating:", err)
-					}
-				}()
-
-				err := x.Objs.QueryCountPerIp.Delete(key)
+			if value != 0 {
+				updates = append(updates, mongo.NewUpdateOneModel().
+					SetFilter(bson.M{"ip": key}).
+					SetUpdate(bson.M{"$inc": bson.M{"QuestionCount": value}}).SetUpsert(true))
+			}
+			go func() {
+				err := db.UpdateMany(updates)
 				if err != nil {
-					log.Println("error deleting:", err)
+					log.Fatal("NIC monitor: error updating:", zap.Error(err))
 				}
+			}()
+
+			err := x.Objs.QueryCountPerIp.Delete(key)
+			if err != nil {
+				log.Fatal("NIC monitor: error deleting:", zap.Error(err))
 			}
-			if err := iter.Err(); err != nil {
-				log.Printf("Iteration error: %v", err)
-			}
-		case <-stop:
-			log.Print("Received signal, exiting..")
-			os.Exit(0)
-			return
+		}
+		if err := iter.Err(); err != nil {
+			log.Fatal("NIC monitor: iteration error: ", zap.Error(err))
 		}
 	}
 }

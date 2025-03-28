@@ -2,6 +2,7 @@ package transport
 
 import (
 	"fmt"
+	"log"
 	"net"
 )
 
@@ -18,7 +19,7 @@ func ForwardPacketTo(data []byte, serverAddr string) ([]byte, error) {
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {
-			panic(err)
+			log.Printf("failed to close name server connection: %v", err)
 		}
 	}()
 

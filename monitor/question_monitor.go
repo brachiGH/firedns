@@ -6,9 +6,11 @@ import (
 	"time"
 
 	"github.com/brachiGH/firedns/internal/utils"
+	"github.com/brachiGH/firedns/internal/utils/logger"
 	"github.com/brachiGH/firedns/monitor/database"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.uber.org/zap"
 )
 
 type questionPair struct {
@@ -40,9 +42,18 @@ func createMongoModel(ip utils.IP, lables []utils.Lable, modelField string) mong
 }
 
 func UpdateQuestions_Routine() {
+	log := logger.NewLogger()
+
 	var db database.Analytics_DB
-	db.Connect()
-	defer db.Disconnect()
+	err := db.Connect()
+	if err != nil {
+		log.Fatal("update question routine failed to connect to database", zap.Error(err))
+	}
+	defer func() {
+		if err := db.Disconnect(); err != nil {
+			log.Fatal("update question routine failed to disconnect", zap.Error(err))
+		}
+	}()
 	tick := time.Tick(30 * time.Second)
 	for range tick {
 		updates := []mongo.WriteModel{}
@@ -55,7 +66,12 @@ func UpdateQuestions_Routine() {
 		}
 
 		if len(updates) != 0 {
-			db.UpdateMany(updates)
+			err := db.UpdateMany(updates)
+			if err != nil {
+				log.Error("update question routine failed to update database", zap.Error(err))
+			} else {
+				log.Debug("dns question", zap.Any("updates", updates))
+			}
 		}
 
 		QuestionMonitorWG.Add(1)

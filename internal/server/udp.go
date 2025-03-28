@@ -24,7 +24,7 @@ func Upd_dns_server() {
 
 	defer func() {
 		if err := udpConn.Close(); err != nil {
-			panic(err)
+			log.Fatal("failed to close connection", zap.Error(err))
 		}
 	}()
 
@@ -34,7 +34,8 @@ func Upd_dns_server() {
 	for {
 		size, source, err := udpConn.ReadFromUDP(buf)
 		if err != nil {
-			log.Debug("Error receiving data: ", zap.Error(err))
+			log.Error("Error receiving data: ", zap.Error(err))
+			continue
 		}
 		if size >= maxPacketsize+1 {
 			// UDP response larger than 512 bytes are not supported
@@ -43,12 +44,13 @@ func Upd_dns_server() {
 
 		data, err := handle(buf[:size], source.IP)
 		if err != nil {
-			log.Debug("Fail to handle request: ", zap.Error(err))
+			log.Error("Fail to handle request: ", zap.Error(err))
+			continue
 		}
 
 		_, err = udpConn.WriteToUDP(data, source)
 		if err != nil {
-			log.Debug("Failed to send response: ", zap.Error(err))
+			log.Error("Failed to send response: ", zap.Error(err))
 		}
 	}
 }

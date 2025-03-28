@@ -1,22 +1,15 @@
 package main
 
 import (
-	"log"
-
 	"github.com/brachiGH/firedns/internal/server"
+	"github.com/brachiGH/firedns/internal/utils/logger"
 	"github.com/brachiGH/firedns/monitor"
 	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
 func main() {
-	// test := flag.String("test", "false", "If the the test flag is set to any value other then false. Testing will begin.")
-	// flag.Parse()
-
-	// if *test != "false" {
-	// 	fmt.Println("Running tests")
-	// 	test.TestDNSOverTLS()
-	// 	os.Exit(1)
-	// }
+	log := logger.NewLogger()
 
 	err := godotenv.Load()
 	if err != nil {
@@ -29,11 +22,11 @@ func main() {
 	var xdp monitor.XDPobj
 	err = xdp.Load()
 	if err != nil {
-		log.Fatal("Failed to load and link XDP: ", err)
+		log.Fatal("Failed to load and link XDP: ", zap.Error(err))
 	}
 	err = xdp.Link()
 	if err != nil {
-		log.Fatal("Failed to link XDP: ", err)
+		log.Fatal("Failed to link XDP: ", zap.Error(err))
 	}
 	defer xdp.UnloadAndCLoseLink()
 	go xdp.NICMonitor()
@@ -41,13 +34,13 @@ func main() {
 	go func() {
 		err := xdp.UpdatePremiumIps()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Updating Premium Ips Failed: ", zap.Error(err))
 		}
 	}()
 	go func() {
 		err := xdp.UpdateUsageLimitIps()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Updating Limited Ips Failed: ", zap.Error(err))
 		}
 	}()
 
