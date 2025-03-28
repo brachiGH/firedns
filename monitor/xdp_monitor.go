@@ -110,7 +110,7 @@ func (x *XDPobj) NICMonitor() {
 		var value uint32
 		iter := x.Objs.QueryCountPerIp.Iterate()
 		for iter.Next(&key, &value) {
-			log.DPanic("XDP", zap.Uint32("key", key), zap.Uint32("value", value))
+			log.Debug("XDP", zap.Uint32("key", key), zap.Uint32("value", value))
 			updates := []mongo.WriteModel{}
 
 			if value != 0 {
