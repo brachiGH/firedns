@@ -1,8 +1,9 @@
-package server
+package transport
 
 import (
 	"net"
 
+	"github.com/brachiGH/firedns/internal/server"
 	"github.com/brachiGH/firedns/internal/utils/logger"
 	"go.uber.org/zap"
 )
@@ -27,7 +28,7 @@ func Upd_dns_server() {
 		}
 	}()
 
-	buf := make([]byte, maxPacketsize+1) // max size is 512, The extra byte is to detect if the packet is lager then 512bytes
+	buf := make([]byte, server.MaxPacketsize+1) // max size is 512, The extra byte is to detect if the packet is lager then 512bytes
 	for {
 		size, source, err := udpConn.ReadFromUDP(buf)
 		if err != nil {
@@ -35,12 +36,12 @@ func Upd_dns_server() {
 			continue
 		}
 		log.Debug("new connection", zap.Any("IP", source.IP.String()))
-		if size >= maxPacketsize+1 {
+		if size >= server.MaxPacketsize+1 {
 			// UDP response larger than 512 bytes are not supported
 			continue
 		}
 
-		data, err := handle(buf[:size], source.IP)
+		data, err := server.HandleDnsMessage(buf[:size], source.IP)
 		if err != nil {
 			log.Error("Fail to handle request: ", zap.Error(err))
 			continue

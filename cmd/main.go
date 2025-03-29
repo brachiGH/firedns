@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/brachiGH/firedns/internal/server"
+	"github.com/brachiGH/firedns/internal/transport"
 	"github.com/brachiGH/firedns/internal/utils/logger"
 	"github.com/brachiGH/firedns/monitor"
 	"github.com/joho/godotenv"
@@ -16,8 +17,8 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	go server.Upd_dns_server()
-	go server.Tcp_dns_server()
+	go transport.Upd_dns_server()
+	go transport.Tcp_dns_server()
 	go server.ClearCache_Routine()
 	go monitor.UpdateQuestions_Routine()
 

@@ -16,7 +16,7 @@ type DNSMessage struct {
 // parsing dns header and Questions
 // returns header content and list raw lables list
 func NewDNSMessage(data []byte) (*DNSQuestion, error) {
-	qoffset := hdrSize
+	qoffset := HdrSize
 	/** RFC 9619 Update (2024-7-24): This document explicitly states that a DNS message with OPCODE = 0 (QUERY)
 	MUST NOT include a QDCOUNT parameter whose value is diffrent than 1
 
@@ -36,7 +36,7 @@ func NewDNSMessage(data []byte) (*DNSQuestion, error) {
 }
 
 func (m *DNSMessage) AsBytes() []byte {
-	b := make([]byte, hdrSize)
+	b := make([]byte, HdrSize)
 	copy(b[0:2], utils.FromUint16(m.hdr.id))
 	copy(b[2:4], m.hdr.flags[:])
 	copy(b[4:6], utils.FromUint16(m.hdr.qdcount))

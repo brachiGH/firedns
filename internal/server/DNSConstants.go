@@ -1,9 +1,9 @@
 package server
 
-const hdrSize = 12
-const QueryInfomationBytesLength = 4 // 2 bytes for QTYPE and 2 bytes for QCLASS
-
 const (
+	HdrSize                    = 12
+	QueryInfomationBytesLength = 4 // 2 bytes for QTYPE and 2 bytes for QCLASS
+
 	qroffset int  = 7 // Set Query/Response flag
 	qrMask   byte = 1 << qroffset
 
@@ -19,5 +19,5 @@ const (
 	opcodeMask byte = ((1 << 4) - 1) << 3 // Opcode field
 	rcodeMask  byte = (1 << 4) - 1
 
-	maxPacketsize int = 512
+	MaxPacketsize int = 512
 )

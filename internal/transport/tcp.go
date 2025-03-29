@@ -1,10 +1,11 @@
-package server
+package transport
 
 import (
 	"encoding/binary"
 	"io"
 	"net"
 
+	"github.com/brachiGH/firedns/internal/server"
 	"github.com/brachiGH/firedns/internal/utils/logger"
 	"go.uber.org/zap"
 )
@@ -52,7 +53,7 @@ func handleTCPConnection(conn net.Conn, log *zap.Logger) {
 	}
 
 	length := binary.BigEndian.Uint16(lengthBuf)
-	if length > uint16(maxPacketsize) {
+	if length > uint16(server.MaxPacketsize) {
 		log.Error("Message too large", zap.Uint16("length", length))
 		return
 	}
@@ -68,7 +69,7 @@ func handleTCPConnection(conn net.Conn, log *zap.Logger) {
 	addr := conn.RemoteAddr().(*net.TCPAddr)
 	log.Debug("new connection", zap.String("IP", addr.IP.String()))
 
-	data, err := handle(buf, addr.IP)
+	data, err := server.HandleDnsMessage(buf, addr.IP)
 	if err != nil {
 		log.Error("Fail to handle request: ", zap.Error(err))
 		return
