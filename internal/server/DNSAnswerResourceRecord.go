@@ -29,6 +29,10 @@ func DNSAnswerFromBytes(data []byte, q *DNSQuestion) *DNSAnswer {
 		arrStartPointer += 2
 	}
 
+	if uint8(len(data)) < arrStartPointer+11 {
+		return nil
+	}
+
 	return &DNSAnswer{
 		name:  name,
 		typ:   utils.ToUint16(data[arrStartPointer : arrStartPointer+2]),
