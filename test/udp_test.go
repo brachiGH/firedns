@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brachiGH/firedns/internal/server"
+	"github.com/brachiGH/firedns/internal/transport"
 	"github.com/brachiGH/firedns/internal/utils/config"
 )
 
 func TestDNSudpMessage(t *testing.T) {
-	go server.Upd_dns_server()
+	go transport.Upd_dns_server()
 
 	// Wait for the UDP server to start
 	time.Sleep(1 * time.Second)

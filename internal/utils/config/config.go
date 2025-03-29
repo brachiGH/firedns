@@ -4,6 +4,7 @@ import "time"
 
 const UDP_ns_addr = "45.90.28.128:53" //name server
 const UDP_local_ns_addr = "127.0.0.1:2053"
+const TCP_local_ns_addr = "127.0.0.1:2053"
 
 const ClearCache__TickDuration = time.Minute
 const UpdateQuestions__TickDuration = 30 * time.Second
