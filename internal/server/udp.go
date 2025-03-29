@@ -4,7 +4,6 @@ import (
 	"net"
 
 	"github.com/brachiGH/firedns/internal/utils/logger"
-	"github.com/brachiGH/firedns/monitor"
 	"go.uber.org/zap"
 )
 
@@ -15,7 +14,7 @@ func Upd_dns_server() {
 	if err != nil {
 		log.Fatal("Failed to resolve UDP address: ", zap.Error(err))
 	}
-	log.Info("Server started", zap.String("port", "2053"))
+	log.Info("UDP Server started", zap.String("port", "2053"))
 
 	udpConn, err := net.ListenUDP("udp", udpAddr)
 	if err != nil {
@@ -27,8 +26,6 @@ func Upd_dns_server() {
 			log.Fatal("failed to close connection", zap.Error(err))
 		}
 	}()
-
-	go monitor.UpdateQuestions_Routine()
 
 	buf := make([]byte, maxPacketsize+1) // max size is 512, The extra byte is to detect if the packet is lager then 512bytes
 	for {

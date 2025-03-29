@@ -17,7 +17,9 @@ func main() {
 	}
 
 	go server.Upd_dns_server()
+	go server.Tcp_dns_server()
 	go server.ClearCache_Routine()
+	go monitor.UpdateQuestions_Routine()
 
 	var xdp monitor.XDPobj
 	err = xdp.Load()
@@ -44,7 +46,7 @@ func main() {
 		}
 	}()
 
-	// go transport.TLS()
+	// go transport.StartTLSServer("8443")
 	// go server.StartDoTServer("/etc/letsencrypt/live/brachi.me/fullchain.pem", "/etc/letsencrypt/live/brachi.me/privkey.pem")
 
 	// dir, err := os.Getwd()
