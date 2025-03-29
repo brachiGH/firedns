@@ -42,7 +42,11 @@ func Tcp_dns_server() {
 }
 
 func handleTCPConnection(conn net.Conn, log *zap.Logger) {
-	defer conn.Close()
+	defer func() {
+		if cerr := conn.Close(); cerr != nil {
+			log.Error("Error closing connection: ", zap.Error(cerr))
+		}
+	}()
 
 	// Read message length (first 2 bytes in TCP DNS)
 	lengthBuf := make([]byte, 2)
