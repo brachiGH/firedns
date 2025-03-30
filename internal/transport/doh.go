@@ -17,6 +17,9 @@ func StartTLSServer(port string) {
 
 	pubkey := os.Getenv("CertFile")
 	prvkey := os.Getenv("KeyFile")
+	if pubkey == "" || prvkey == "" {
+		return
+	}
 	cert, err := tls.LoadX509KeyPair(pubkey, prvkey)
 	if err != nil {
 		log.Fatal("Error loading certificates:", zap.Error(err))

@@ -20,7 +20,6 @@ services:
       MONGO_DB_URI: mongodb://root:root@mongo:27017
       APP_ENV: production
     container_name: firedns
-    privileged: true
     ulimits:
       memlock: -1
     command: ./main
