@@ -23,7 +23,7 @@ struct
   __uint(type, BPF_MAP_TYPE_HASH);
   __type(key, __be32);
   __type(value, bool);
-  __uint(max_entries, MAX_ENTRIES_LOADED_IN_RAM);
+  __uint(max_entries, MAX_IP_ENTRIES_LOADED_IN_RAM);
 } premium_ips SEC(".maps");
 
 struct
@@ -31,7 +31,7 @@ struct
   __uint(type, BPF_MAP_TYPE_HASH);
   __type(key, __be32);
   __type(value, bool);
-  __uint(max_entries, MAX_ENTRIES_LOADED_IN_RAM);
+  __uint(max_entries, MAX_IP_ENTRIES_LOADED_IN_RAM);
 } usage_limit_exeded_ips SEC(".maps");
 
 // count response queries per ip (ingress)
@@ -56,6 +56,13 @@ int query_analyser(struct xdp_md *ctx)
   }
 
   struct iphdr *ip = data + sizeof(*eth);
+  
+  __be32 key = ip->addrs.saddr;
+  bool *is_usage_exeded = bpf_map_lookup_elem(&usage_limit_exeded_ips, &key);
+  if (is_usage_exeded)
+  {
+    return XDP_DROP;
+  }
 
   if (ip->version != 4)
   {
@@ -102,13 +109,6 @@ int query_analyser(struct xdp_md *ctx)
 
 record_ip:
 {
-  __be32 key = ip->addrs.saddr;
-  bool *is_usage_exeded = bpf_map_lookup_elem(&usage_limit_exeded_ips, &key);
-  if (is_usage_exeded)
-  {
-    return XDP_DROP;
-  }
-
   __u32 *question_count = bpf_map_lookup_elem(&query_count_per_ip, &key);
 
   if (question_count)
@@ -116,7 +116,7 @@ record_ip:
     // drop users query if the are more MAX_QUERIES_PER_TICK
     // eliminate the risk of dos attack
     __sync_fetch_and_add(question_count, 1);
-    if (*question_count > MAX_QUERIES_PER_TICK)
+    if (*question_count > MAX_QUERIES_PER_IP_PER_TICK)
     {
       bool *is_premium_user = bpf_map_lookup_elem(&premium_ips, &key);
       if (is_premium_user)
