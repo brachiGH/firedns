@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"log"
 	"net"
+
+	"github.com/brachiGH/firedns/internal/utils/config"
 )
 
-func ForwardPacketTo(data []byte, serverAddr string) ([]byte, error) {
-	addr, err := net.ResolveUDPAddr("udp", serverAddr)
+func ForwardPacketTo(data []byte) ([]byte, error) {
+	addr, err := net.ResolveUDPAddr("udp", config.UDP_ns_addr)
 	if err != nil {
 		return []byte{}, fmt.Errorf("error resolving UDP address: %w", err)
 	}

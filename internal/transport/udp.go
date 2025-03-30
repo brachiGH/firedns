@@ -4,6 +4,7 @@ import (
 	"net"
 
 	"github.com/brachiGH/firedns/internal/server"
+	"github.com/brachiGH/firedns/internal/utils/config"
 	"github.com/brachiGH/firedns/internal/utils/logger"
 	"go.uber.org/zap"
 )
@@ -41,7 +42,7 @@ func Upd_dns_server() {
 			continue
 		}
 
-		data, err := server.HandleDnsMessage(buf[:size], source.IP)
+		data, err := server.HandleDnsMessage(buf[:size], source.IP, config.NO_PROFILE_ID)
 		if err != nil {
 			log.Error("Fail to handle request: ", zap.Error(err))
 			continue

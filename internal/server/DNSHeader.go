@@ -17,6 +17,11 @@ func NewDNSFlag() DNSFlag {
 	return [2]byte{}
 }
 
+// Get Query/Response flag
+func (f *DNSFlag) QR() uint8 {
+	return f[0] & qrMask >> 7
+}
+
 // Set Query/Response flag
 func (f *DNSFlag) SetQR(v int) {
 	if v != 0 {
@@ -93,7 +98,7 @@ func (f *DNSFlag) SetTC(v int) {
 	f[1] = (f[1] & ^tcMask) | (byte(v) * tcMask)
 }
 
-func NewDNSHeader(data []byte) *DNSHeader {
+func NewDNSHeader(data []byte) (*DNSHeader, error) {
 	hdr := &DNSHeader{
 		id:      utils.ToUint16(data[0:2]),
 		qdcount: utils.ToUint16(data[4:6]),
@@ -102,5 +107,10 @@ func NewDNSHeader(data []byte) *DNSHeader {
 		arcount: utils.ToUint16(data[10:12]),
 	}
 	copy(hdr.flags[:], data[2:4])
-	return hdr
+
+	err := checkHeaderErrors(hdr)
+	if err != nil {
+		return nil, err
+	}
+	return hdr, nil
 }

@@ -48,7 +48,11 @@ Next, create a `.env`
 ifname=eth0
 MONGO_DB_URI=mongodb://root:root@localhost:27017
 APP_ENV=development
+CertFile=The absolute path to public key
+KeyFile=The absolute path to private key
 ```
+
+Note: CertFile and KeyFile are optional. If they are not provided, only the HTTP server will start.
 
 build:
 

@@ -5,19 +5,16 @@ import (
 	"net"
 
 	"github.com/brachiGH/firedns/internal/utils"
-	"github.com/brachiGH/firedns/internal/utils/config"
 	"github.com/brachiGH/firedns/monitor"
 )
 
 // checks for blocked domains and forwards the packet to dns resolver
-func HandleDnsMessage(data []byte, sourceIP net.IP) ([]byte, error) {
+func HandleDnsMessage(data []byte, sourceIP net.IP, profileID string) ([]byte, error) {
 	if len(data) < HdrSize {
 		return nil, fmt.Errorf("message is too short")
 	}
 
-	hdr := NewDNSHeader(data)
-
-	err := checkHeaderErrors(hdr)
+	hdr, err := NewDNSHeader(data)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +43,7 @@ func HandleDnsMessage(data []byte, sourceIP net.IP) ([]byte, error) {
 
 	arr := GetDNSAnswer__Cache(lables)
 	if arr == nil {
-		data, err = ForwardPacketTo(data, config.UDP_ns_addr)
+		data, err = ForwardPacketTo(data)
 		if err != nil {
 			return nil, fmt.Errorf("fail to lookup: %w", err)
 		}

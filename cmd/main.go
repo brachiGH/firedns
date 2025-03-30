@@ -19,6 +19,7 @@ func main() {
 
 	go transport.Upd_dns_server()
 	go transport.Tcp_dns_server()
+	go transport.StartTLSServer("8443")
 	go server.ClearCache_Routine()
 	go monitor.UpdateQuestions_Routine()
 
@@ -46,27 +47,6 @@ func main() {
 			log.Fatal("Updating Limited Ips Failed: ", zap.Error(err))
 		}
 	}()
-
-	// go transport.StartTLSServer("8443")
-	// go server.StartDoTServer("/etc/letsencrypt/live/brachi.me/fullchain.pem", "/etc/letsencrypt/live/brachi.me/privkey.pem")
-
-	// dir, err := os.Getwd()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// // Log the directory being served
-	// fmt.Println("Serving files from:", dir)
-
-	// // Serve files in the current directory (or subdirectories)
-	// http.Handle("/", http.FileServer(http.Dir(dir)))
-
-	// // Start the server on port 8080
-	// fmt.Println("Server is running on http://localhost:8080")
-	// err = http.ListenAndServe(":8080", nil)
-	// if err != nil {
-	// 	log.Fatal("Server failed to start: ", err)
-	// }
 
 	select {}
 }
