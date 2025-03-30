@@ -54,7 +54,11 @@ func StartTLSServer(port string) {
 		}
 
 		w.Header().Set("Content-Type", "application/dns-message")
-		w.Write(data)
+		_, err = w.Write(data)
+		if err != nil {
+			log.Error("Fail to write request: ", zap.Error(err))
+			return
+		}
 	})
 
 	server := &http.Server{
