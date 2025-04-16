@@ -40,6 +40,15 @@ apt-get install -y build-essential git cmake make \
 		       linux-headers-$(uname -r)
 ```
 
+Build and install ebpf:
+
+```
+git clone --branch v1.3.0 https://github.com/libbpf/libbpf.git
+cd libbpf/src
+make
+make install
+```
+
 and install GO from [go.dev](https://go.dev/).
 
 Next, create a `.env`
@@ -57,6 +66,12 @@ Note: CertFile and KeyFile are optional. If they are not provided, only the HTTP
 build:
 
 ```bash
+go mod download
+
+cd monitor
+go generate
+
+cd ..
 make cleabmake
 ```
 
