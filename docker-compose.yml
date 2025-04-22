@@ -1,3 +1,9 @@
+secrets:
+  tls_cert:
+    file: /etc/letsencrypt/live/brachi.me/fullchain.pem
+  tls_key:
+    file: /etc/letsencrypt/live/brachi.me/privkey.pem
+
 services:
   mongo:
     image: mongo:latest
@@ -19,19 +25,26 @@ services:
       ifname: eth0
       MONGO_DB_URI: mongodb://root:root@mongo:27017
       APP_ENV: production
+      CertFile: /run/secrets/tls_cert
+      KeyFile: /run/secrets/tls_key
     container_name: firedns
     ulimits:
       memlock: -1
+    cap_add: # Add this section
+      - CAP_BPF
+      - CAP_NET_ADMIN
+      - CAP_IPC_LOCK
     command: ./main
     ports:
       - "2053:2053/udp"
     networks:
       - "mongo-network"
-
+    secrets:
+      - tls_cert
+      - tls_key
 
 volumes:
   mongo-data:
-
 
 networks:
   mongo-network:

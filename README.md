@@ -10,14 +10,26 @@ FireDNS protects you from all kinds of security threats, blocks ads and trackers
 First start with updating the docker-compose.yml and change default passwords
 
 ```yml
+secrets:
+  tls_cert:
+    file: /path/on/host/to/your/fullchain.pem # Replace with the actual host path
+  tls_key:
+    file: /path/on/host/to/your/privkey.pem   # Replace with the actual host path
+
+--------
+
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
 
+--------
 
     environment:
       ifname: eth0
       MONGO_DB_URI: mongodb://root:root@mongo:27017
+      APP_ENV: production
+      CertFile: path to public key
+      KeyFile: path to private key
 
 ```
 then run 
