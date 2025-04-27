@@ -5,6 +5,7 @@ import (
 	"github.com/brachiGH/firedns/internal/transport"
 	"github.com/brachiGH/firedns/internal/utils/logger"
 	"github.com/brachiGH/firedns/monitor"
+	"github.com/brachiGH/firedns/monitor/database"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
@@ -16,6 +17,20 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	// Connect to Analytics MongoDB
+	analyticsDB := &database.Analytics_DB{}
+	if err := analyticsDB.Connect(); err != nil {
+		log.Fatal("Failed to connect to Analytics MongoDB: %v", zap.Error(err))
+	}
+	defer analyticsDB.Disconnect()
+
+	// Connect to UserSettings MongoDB
+	settingsDB := &database.UserSettings_DB{}
+	if err := settingsDB.Connect(); err != nil {
+		log.Fatal("Failed to connect to Analytics MongoDB: %v", zap.Error(err))
+	}
+	defer settingsDB.Disconnect()
 
 	go transport.Upd_dns_server()
 	go transport.Tcp_dns_server()

@@ -10,31 +10,30 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type Analytics_DB struct {
-	collection *mongo.Collection
-	client     *mongo.Client
+type UserSettings_DB struct {
+	BlockedDomainsList *mongo.Collection
+	client             *mongo.Client
 }
 
-var global_analytics_db *Analytics_DB
+var global_settings_db *UserSettings_DB
 
-func GetAnalyticsDB() (*Analytics_DB, error) {
-	if global_analytics_db != nil {
-		return global_analytics_db, nil
+func GetSettingsDB() (*UserSettings_DB, error) {
+	if global_settings_db != nil {
+		return global_settings_db, nil
 	}
 
-	db := &Analytics_DB{}
+	db := &UserSettings_DB{}
 	if err := db.Connect(); err != nil {
 		return nil, err
 	}
 	return db, nil
 }
 
-func (a *Analytics_DB) Connect() error {
+func (a *UserSettings_DB) Connect() error {
 	// Interface on your machine.
 	// MongoDB URI and database name
 	uri := os.Getenv("MONGO_DB_URI")
-	const dbName = "FireDNSanalytics"
-	const collectionName = "DNSmessages"
+	const dbName = "FireDNSUserSettings"
 
 	// Set client options
 	clientOptions := options.Client().ApplyURI(uri)
@@ -55,20 +54,23 @@ func (a *Analytics_DB) Connect() error {
 	fmt.Println("Connected to MongoDB!")
 
 	// Get a handle for the collection
-	a.collection = a.client.Database(dbName).Collection(collectionName)
+	a.BlockedDomainsList = a.client.Database(dbName).Collection("BlockedDomainsList")
+
+	// Set global db
+	global_settings_db = a
 
 	return nil
 }
 
-func (a *Analytics_DB) Disconnect() {
+func (a *UserSettings_DB) Disconnect() {
 	if err := a.client.Disconnect(context.Background()); err != nil {
 		fmt.Printf("error disconnecting from db: %s\n", err)
 	}
 }
 
-func (a *Analytics_DB) Update(ip bson.M, doc bson.M) (ID interface{}, err error) {
+func (a *UserSettings_DB) Update(ip bson.M, doc bson.M, collection *mongo.Collection) (ID interface{}, err error) {
 	updateOptions := options.Update().SetUpsert(true)
-	insertOneResult, err := a.collection.UpdateOne(context.Background(), ip, doc, updateOptions)
+	insertOneResult, err := collection.UpdateOne(context.Background(), ip, doc, updateOptions)
 	if err != nil {
 		return nil, fmt.Errorf("error updating db: %w", err)
 	}
@@ -76,8 +78,8 @@ func (a *Analytics_DB) Update(ip bson.M, doc bson.M) (ID interface{}, err error)
 	return insertOneResult.UpsertedID, nil
 }
 
-func (a *Analytics_DB) UpdateMany(updates []mongo.WriteModel) error {
-	_, err := a.collection.BulkWrite(context.Background(), updates)
+func (a *UserSettings_DB) UpdateMany(updates []mongo.WriteModel, collection *mongo.Collection) error {
+	_, err := collection.BulkWrite(context.Background(), updates)
 	if err != nil {
 		return fmt.Errorf("error updating many docs: %w", err)
 	}

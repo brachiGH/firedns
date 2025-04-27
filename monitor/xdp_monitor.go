@@ -91,16 +91,10 @@ func (x *XDPobj) NICMonitor() {
 
 	//** note: If eBPF/XDP related objects are not defined, execute the 'go generate' command in the directory containing this file. **//
 
-	var db database.Analytics_DB
-	err := db.Connect()
+	db, err := database.GetAnalyticsDB()
 	if err != nil {
-		log.Fatal("NIC monitor: failed to connect", zap.Error(err))
+		log.Error("Failded to connect to the db: %w", zap.Error(err))
 	}
-	defer func() {
-		if err := db.Disconnect(); err != nil {
-			log.Fatal("NIC monitor: failed to disconnect", zap.Error(err))
-		}
-	}()
 
 	// Periodically fetch the packet counter from PktCount,
 	// exit the program when interrupted.

@@ -45,16 +45,11 @@ func createMongoModel(ip utils.IP, lables []utils.Lable, modelField string) mong
 func UpdateQuestions_Routine() {
 	log := logger.NewLogger()
 
-	var db database.Analytics_DB
-	err := db.Connect()
+	db, err := database.GetAnalyticsDB()
 	if err != nil {
-		log.Fatal("update question routine failed to connect to database", zap.Error(err))
+		log.Error("Failded to connect to the db: %w", zap.Error(err))
 	}
-	defer func() {
-		if err := db.Disconnect(); err != nil {
-			log.Fatal("update question routine failed to disconnect", zap.Error(err))
-		}
-	}()
+
 	tick := time.Tick(config.UpdateQuestions__TickDuration)
 	for range tick {
 		updates := []mongo.WriteModel{}
