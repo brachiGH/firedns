@@ -3,6 +3,8 @@
 
 FireDNS protects you from all kinds of security threats, blocks ads and trackers on websites and in apps and provides a safe and supervised Internet for kids — on all devices and on all networks. While allowing you to see what's happening on your devices with in-depth analytics and real-time logs.
 
+View front-end [here](https://github.com/brachiGH/firedns-dashboard)
+
 ## Setup and run FireDNS localy
 
 ### Using Docker
